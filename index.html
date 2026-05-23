@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texhouse Pickleball — Book a Court</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1565C0;
+    --blue-dark: #0D47A1;
+    --blue-light: #1976D2;
+    --yellow: #FFD600;
+    --yellow-dark: #F9A825;
+    --white: #FFFFFF;
+    --gray-light: #F4F6FA;
+    --gray: #B0BEC5;
+    --text: #1A237E;
+    --text-body: #263238;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--blue-dark);
+    min-height: 100vh;
+    color: var(--text-body);
+    overflow-x: hidden;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%);
+    padding: 48px 24px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,214,0,0.08);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -30px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,214,0,0.06);
+  }
+
+  .ball-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 10vw, 72px);
+    color: var(--yellow);
+    letter-spacing: 2px;
+    line-height: 0.95;
+    text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+  }
+
+  .hero h1 span {
+    color: var(--white);
+    display: block;
+    font-size: clamp(28px, 6vw, 44px);
+  }
+
+  .hero-sub {
+    color: rgba(255,255,255,0.85);
+    font-size: 15px;
+    margin-top: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .hours-strip {
+    background: var(--yellow);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .hours-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: var(--blue-dark);
+    font-size: 14px;
+  }
+
+  .hours-item .icon { font-size: 18px; }
+
+  .container {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--blue-dark);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: #607D8B;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  .form-group { margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #E3E8F0;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: var(--text-body);
+    background: var(--gray-light);
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+    appearance: auto;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--blue);
+    background: var(--white);
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--blue-dark);
+    color: var(--yellow);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: transform 0.15s, background 0.2s;
+  }
+
+  .submit-btn:hover { background: var(--blue); transform: translateY(-2px); }
+  .submit-btn:active { transform: translateY(0px); }
+
+  .whatsapp-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #E8F5E9;
+    border: 1.5px solid #A5D6A7;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #2E7D32;
+    font-weight: 700;
+  }
+
+  .wa-icon { font-size: 20px; flex-shrink: 0; }
+
+  .location-bar {
+    background: rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,214,0,0.2);
+    text-align: center;
+    padding: 20px;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .location-bar strong {
+    color: var(--yellow);
+    display: block;
+    font-size: 15px;
+    margin-top: 2px;
+  }
+
+  .divider { height: 1px; background: #E3E8F0; margin: 20px 0; }
+  .required { color: #E53935; }
+
+  @media (max-width: 480px) {
+    .row-2 { grid-template-columns: 1fr; }
+    .card { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="ball-icon">🎾</span>
+  <h1>PICKLEBALL<span>Games & Fun</span></h1>
+  <p class="hero-sub">📍 Texhouse, Lorong 14, Jalan Rubber</p>
+</div>
+
+<div class="hours-strip">
+  <div class="hours-item">
+    <span class="icon">📅</span>
+    <span>WEEKDAY &nbsp;17:00 – 21:00</span>
+  </div>
+  <div class="hours-item">
+    <span class="icon">🗓️</span>
+    <span>WEEKEND &nbsp;07:00 – 21:00</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="card-title">Book Your Court</div>
+    <div class="card-sub">Fill in your details — we'll confirm via WhatsApp</div>
+
+    <div class="form-group">
+      <label>Full Name <span class="required">*</span></label>
+      <input type="text" id="name" placeholder="e.g. Ahmad Razif" />
+    </div>
+
+    <div class="row-2">
+      <div class="form-group">
+        <label>Phone Number <span class="required">*</span></label>
+        <input type="tel" id="phone" placeholder="e.g. 0123456789" />
+      </div>
+      <div class="form-group">
+        <label>No. of Players <span class="required">*</span></label>
+        <select id="players">
+          <option value="">Select</option>
+          <option value="2">2 Players</option>
+          <option value="3">3 Players</option>
+          <option value="4">4 Players</option>
+          <option value="5+">5+ Players</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="form-group">
+        <label>Date <span class="required">*</span></label>
+        <input type="date" id="date" />
+      </div>
+      <div class="form-group">
+        <label>Day Type <span class="required">*</span></label>
+        <select id="daytype">
+          <option value="">Select</option>
+          <option value="Weekday">Weekday</option>
+          <option value="Weekend">Weekend / Public Holiday</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Preferred Time Slot <span class="required">*</span></label>
+      <select id="timeslot">
+        <option value="">Select a time</option>
+        <option value="07:00 - 09:00">07:00 – 09:00 (Weekend only)</option>
+        <option value="09:00 - 11:00">09:00 – 11:00 (Weekend only)</option>
+        <option value="11:00 - 13:00">11:00 – 13:00 (Weekend only)</option>
+        <option value="13:00 - 15:00">13:00 – 15:00 (Weekend only)</option>
+        <option value="15:00 - 17:00">15:00 – 17:00 (Weekend only)</option>
+        <option value="17:00 - 19:00">17:00 – 19:00</option>
+        <option value="19:00 - 21:00">19:00 – 21:00</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Notes (Optional)</label>
+      <textarea id="notes" placeholder="e.g. First time playing, need equipment, etc."></textarea>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="submit-btn" onclick="bookNow()">🏓 SEND BOOKING VIA WHATSAPP</button>
+
+    <div class="whatsapp-note">
+      <span class="wa-icon">💬</span>
+      <span>Your details will open in WhatsApp — just tap Send to complete your booking!</span>
+    </div>
+  </div>
+</div>
+
+<div class="location-bar">
+  📍 Find us at
+  <strong>Texhouse, Lorong 14, Jalan Rubber</strong>
+  Fun for all levels · Stay active & healthy · Great community
+</div>
+
+<script>
+  const waNumber = "60178587259";
+
+  const dateInput = document.getElementById('date');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.setAttribute('min', today);
+
+  dateInput.addEventListener('change', function() {
+    const d = new Date(this.value + 'T00:00:00');
+    const day = d.getDay();
+    const dayTypeEl = document.getElementById('daytype');
+    if (day === 0 || day === 6) {
+      dayTypeEl.value = 'Weekend';
+    } else {
+      dayTypeEl.value = 'Weekday';
+    }
+  });
+
+  function bookNow() {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const players = document.getElementById('players').value;
+    const date = document.getElementById('date').value;
+    const daytype = document.getElementById('daytype').value;
+    const timeslot = document.getElementById('timeslot').value;
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!name || !phone || !players || !date || !daytype || !timeslot) {
+      alert('Please fill in all required fields before submitting.');
+      return;
+    }
+
+    const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-MY', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    let message = `Hello! I'd like to book a Pickleball court at Texhouse. 🏓\n\n`;
+    message += `📋 *BOOKING DETAILS*\n`;
+    message += `👤 Name: ${name}\n`;
+    message += `📱 Phone: ${phone}\n`;
+    message += `📅 Date: ${formattedDate}\n`;
+    message += `🗓️ Day: ${daytype}\n`;
+    message += `🕐 Time Slot: ${timeslot}\n`;
+    message += `👥 Players: ${players}\n`;
+    if (notes) message += `📝 Notes: ${notes}\n`;
+    message += `\nPlease confirm my booking. Thank you! 🙏`;
+
+    const encoded = encodeURIComponent(message);
+    const url = `https://wa.me/${waNumber}?text=${encoded}`;
+    window.open(url, '_blank');
+  }
+</script>
+
+</body>
+</html>
