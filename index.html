@@ -2,385 +2,735 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Texhouse Pickleball — Book a Court</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0D47A1;--blue2:#1565C0;--blue3:#1976D2;
+  --yellow:#FFD600;--yellow2:#FFAB00;
+  --white:#fff;--card:#ffffffee;
+  --text:#1A237E;--body:#263238;--muted:#607D8B;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Nunito',sans-serif;
+  background:#0a1628;
+  min-height:100vh;
+  color:var(--body);
+  overflow-x:hidden;
+}
 
-  :root {
-    --blue: #1565C0;
-    --blue-dark: #0D47A1;
-    --blue-light: #1976D2;
-    --yellow: #FFD600;
-    --yellow-dark: #F9A825;
-    --white: #FFFFFF;
-    --gray-light: #F4F6FA;
-    --gray: #B0BEC5;
-    --text: #1A237E;
-    --text-body: #263238;
-  }
+/* === ANIMATED CANVAS BG === */
+#bgCanvas{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--blue-dark);
-    min-height: 100vh;
-    color: var(--text-body);
-    overflow-x: hidden;
-  }
+/* === HERO === */
+.hero{
+  position:relative;z-index:2;
+  text-align:center;
+  padding:56px 20px 40px;
+  overflow:hidden;
+}
+.hero-badge{
+  display:inline-block;
+  background:rgba(255,214,0,0.15);
+  border:1.5px solid rgba(255,214,0,0.4);
+  color:var(--yellow);
+  font-size:11px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;
+  padding:6px 18px;border-radius:100px;
+  margin-bottom:16px;
+  animation:fadeDown 0.6s ease both;
+}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(56px,16vw,96px);
+  color:var(--yellow);
+  letter-spacing:3px;line-height:0.9;
+  text-shadow:0 4px 30px rgba(255,214,0,0.3);
+  animation:fadeDown 0.7s 0.1s ease both;
+}
+.hero h1 span{
+  display:block;
+  color:#fff;
+  font-size:clamp(30px,8vw,52px);
+  letter-spacing:2px;
+}
+.hero-sub{
+  margin-top:14px;
+  color:rgba(255,255,255,0.7);
+  font-size:13px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  animation:fadeDown 0.7s 0.2s ease both;
+}
+.ball-float{
+  display:inline-block;
+  font-size:52px;
+  margin-bottom:10px;
+  animation:float 3s ease-in-out infinite, fadeDown 0.6s ease both;
+}
 
-  .hero {
-    background: linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%);
-    padding: 48px 24px 36px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
+/* === HOURS BAR === */
+.hours-strip{
+  position:relative;z-index:2;
+  background:var(--yellow);
+  padding:14px 20px;
+  display:flex;justify-content:center;
+  gap:24px;flex-wrap:wrap;
+}
+.hours-item{
+  display:flex;align-items:center;gap:8px;
+  font-weight:900;color:var(--blue);font-size:13px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
 
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: rgba(255,214,0,0.08);
-  }
+/* === MAIN CONTAINER === */
+.main{
+  position:relative;z-index:2;
+  max-width:520px;
+  margin:0 auto;
+  padding:28px 16px 60px;
+}
 
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: -60px; left: -30px;
-    width: 160px; height: 160px;
-    border-radius: 50%;
-    background: rgba(255,214,0,0.06);
-  }
+/* === STEP INDICATOR === */
+.steps{
+  display:flex;align-items:center;
+  justify-content:center;
+  gap:0;margin-bottom:24px;
+}
+.step-dot{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,0.1);
+  border:2px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:rgba(255,255,255,0.4);
+  transition:all 0.3s ease;
+  cursor:default;
+}
+.step-dot.active{
+  background:var(--yellow);border-color:var(--yellow);
+  color:var(--blue);transform:scale(1.1);
+}
+.step-dot.done{
+  background:#4CAF50;border-color:#4CAF50;color:#fff;
+}
+.step-line{
+  width:40px;height:2px;
+  background:rgba(255,255,255,0.15);
+  transition:background 0.3s;
+}
+.step-line.done{background:#4CAF50;}
 
-  .ball-icon {
-    font-size: 48px;
-    margin-bottom: 8px;
-    display: block;
-  }
+/* === CARD === */
+.card{
+  background:rgba(255,255,255,0.97);
+  border-radius:24px;
+  padding:28px 24px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1);
+  animation:slideUp 0.5s ease both;
+}
+.card-header{
+  margin-bottom:22px;
+}
+.card-step-label{
+  font-size:11px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--blue2);margin-bottom:4px;
+}
+.card-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;color:var(--blue);
+  letter-spacing:1px;line-height:1;
+}
+.card-sub{font-size:13px;color:var(--muted);font-weight:600;margin-top:4px;}
 
-  .hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(42px, 10vw, 72px);
-    color: var(--yellow);
-    letter-spacing: 2px;
-    line-height: 0.95;
-    text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
-  }
+/* === FORM ELEMENTS === */
+.form-group{margin-bottom:16px;}
+label{
+  display:block;font-size:11px;font-weight:800;
+  color:var(--blue);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:0.8px;
+}
+.req{color:#E53935;}
+input,select,textarea{
+  width:100%;padding:13px 16px;
+  border:2px solid #E8EDF5;border-radius:12px;
+  font-family:'Nunito',sans-serif;font-size:15px;
+  color:var(--body);background:#F7F9FC;
+  transition:all 0.2s ease;outline:none;
+  appearance:auto;-webkit-appearance:auto;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--blue2);background:#fff;
+  box-shadow:0 0 0 4px rgba(21,101,192,0.1);
+}
+input.valid{border-color:#4CAF50;}
+textarea{resize:vertical;min-height:72px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
-  .hero h1 span {
-    color: var(--white);
-    display: block;
-    font-size: clamp(28px, 6vw, 44px);
-  }
+/* === PLAYER SELECTOR === */
+.player-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  margin-top:2px;
+}
+.player-btn{
+  padding:10px 4px;border-radius:10px;
+  border:2px solid #E8EDF5;
+  background:#F7F9FC;
+  font-family:'Nunito',sans-serif;
+  font-size:13px;font-weight:800;
+  color:var(--muted);cursor:pointer;
+  transition:all 0.2s ease;text-align:center;
+}
+.player-btn:hover{border-color:var(--blue2);color:var(--blue2);}
+.player-btn.selected{
+  background:var(--blue);border-color:var(--blue);
+  color:#fff;transform:scale(1.05);
+}
 
-  .hero-sub {
-    color: rgba(255,255,255,0.85);
-    font-size: 15px;
-    margin-top: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+/* === TIME SLOTS === */
+.slot-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-top:2px;
+}
+.slot-btn{
+  padding:10px 8px;border-radius:10px;
+  border:2px solid #E8EDF5;background:#F7F9FC;
+  font-family:'Nunito',sans-serif;
+  font-size:12px;font-weight:700;
+  color:var(--muted);cursor:pointer;
+  transition:all 0.2s ease;text-align:center;
+  line-height:1.3;
+}
+.slot-btn:hover:not(.disabled){border-color:var(--blue2);color:var(--blue2);}
+.slot-btn.selected{background:var(--blue);border-color:var(--blue);color:#fff;}
+.slot-btn.disabled{opacity:0.35;cursor:not-allowed;}
+.slot-tag{
+  font-size:10px;font-weight:700;
+  background:rgba(255,171,0,0.15);color:#E65100;
+  border-radius:4px;padding:1px 4px;
+  display:inline-block;margin-top:2px;
+}
 
-  .hours-strip {
-    background: var(--yellow);
-    padding: 12px 24px;
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    flex-wrap: wrap;
-  }
+/* === BUTTONS === */
+.btn-next,.btn-back,.btn-submit{
+  width:100%;padding:16px;
+  border:none;border-radius:14px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;letter-spacing:2px;
+  cursor:pointer;transition:all 0.2s ease;
+  margin-top:8px;
+}
+.btn-next{background:var(--blue);color:var(--yellow);}
+.btn-next:hover{background:var(--blue2);transform:translateY(-2px);}
+.btn-back{
+  background:transparent;color:var(--muted);
+  border:2px solid #E8EDF5;
+  font-size:16px;letter-spacing:1px;
+  margin-top:8px;
+}
+.btn-back:hover{background:#F7F9FC;}
+.btn-submit{
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  color:#fff;font-size:18px;
+  box-shadow:0 8px 24px rgba(37,211,102,0.3);
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,211,102,0.4);}
+.btn-submit:active{transform:translateY(0);}
 
-  .hours-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 800;
-    color: var(--blue-dark);
-    font-size: 14px;
-  }
+/* === SUMMARY CARD === */
+.summary-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid #F0F4F8;
+}
+.summary-item:last-child{border-bottom:none;}
+.summary-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:#EEF2FF;display:flex;align-items:center;
+  justify-content:center;font-size:16px;flex-shrink:0;
+}
+.summary-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.summary-val{font-size:15px;font-weight:700;color:var(--blue);margin-top:1px;}
 
-  .hours-item .icon { font-size: 18px; }
+/* === SUCCESS === */
+.success-state{text-align:center;padding:20px 0;}
+.success-icon{font-size:64px;animation:pop 0.5s ease both;}
+.success-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px;color:var(--blue);
+  letter-spacing:1px;margin:12px 0 6px;
+}
+.success-sub{font-size:14px;color:var(--muted);font-weight:600;line-height:1.5;}
 
-  .container {
-    max-width: 560px;
-    margin: 0 auto;
-    padding: 32px 20px 48px;
-  }
+/* === FOOTER === */
+.footer{
+  position:relative;z-index:2;
+  text-align:center;padding:20px 16px;
+  color:rgba(255,255,255,0.4);
+  font-size:12px;font-weight:600;
+}
+.footer strong{color:rgba(255,214,0,0.7);display:block;font-size:13px;}
 
-  .card {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 32px 28px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
+/* === FLOATING BALLS === */
+.floating-balls{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:1;overflow:hidden;
+}
+.fball{
+  position:absolute;
+  border-radius:50%;
+  opacity:0.06;
+  animation:drift linear infinite;
+}
 
-  .card-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    color: var(--blue-dark);
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
+/* === ANIMATIONS === */
+@keyframes fadeDown{
+  from{opacity:0;transform:translateY(-16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+@keyframes pop{
+  0%{transform:scale(0)}
+  70%{transform:scale(1.15)}
+  100%{transform:scale(1)}
+}
+@keyframes drift{
+  0%{transform:translateY(100vh) rotate(0deg);opacity:0}
+  10%{opacity:0.06}
+  90%{opacity:0.06}
+  100%{transform:translateY(-120px) rotate(720deg);opacity:0}
+}
 
-  .card-sub {
-    font-size: 13px;
-    color: #607D8B;
-    margin-bottom: 24px;
-    font-weight: 600;
-  }
-
-  .form-group { margin-bottom: 18px; }
-
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--blue-dark);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  input, select, textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #E3E8F0;
-    border-radius: 10px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    color: var(--text-body);
-    background: var(--gray-light);
-    transition: border-color 0.2s, background 0.2s;
-    outline: none;
-    appearance: auto;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--blue);
-    background: var(--white);
-  }
-
-  textarea { resize: vertical; min-height: 80px; }
-
-  .row-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .submit-btn {
-    width: 100%;
-    padding: 16px;
-    background: var(--blue-dark);
-    color: var(--yellow);
-    border: none;
-    border-radius: 12px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 2px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: transform 0.15s, background 0.2s;
-  }
-
-  .submit-btn:hover { background: var(--blue); transform: translateY(-2px); }
-  .submit-btn:active { transform: translateY(0px); }
-
-  .whatsapp-note {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #E8F5E9;
-    border: 1.5px solid #A5D6A7;
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-top: 16px;
-    font-size: 13px;
-    color: #2E7D32;
-    font-weight: 700;
-  }
-
-  .wa-icon { font-size: 20px; flex-shrink: 0; }
-
-  .location-bar {
-    background: rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,214,0,0.2);
-    text-align: center;
-    padding: 20px;
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .location-bar strong {
-    color: var(--yellow);
-    display: block;
-    font-size: 15px;
-    margin-top: 2px;
-  }
-
-  .divider { height: 1px; background: #E3E8F0; margin: 20px 0; }
-  .required { color: #E53935; }
-
-  @media (max-width: 480px) {
-    .row-2 { grid-template-columns: 1fr; }
-    .card { padding: 24px 18px; }
-  }
+/* === MOBILE === */
+@media(max-width:400px){
+  .row2{grid-template-columns:1fr;}
+  .player-grid{grid-template-columns:repeat(4,1fr);}
+  .slot-grid{grid-template-columns:1fr 1fr;}
+  .card{padding:22px 18px;}
+  .hero h1{font-size:clamp(48px,14vw,80px);}
+}
 </style>
 </head>
 <body>
 
+<canvas id="bgCanvas"></canvas>
+
+<div class="floating-balls" id="floatingBalls"></div>
+
 <div class="hero">
-  <span class="ball-icon">🎾</span>
+  <div class="ball-float">🏓</div>
+  <div class="hero-badge">📍 Texhouse · Lorong 14, Jalan Rubber</div>
   <h1>PICKLEBALL<span>Games & Fun</span></h1>
-  <p class="hero-sub">📍 Texhouse, Lorong 14, Jalan Rubber</p>
+  <p class="hero-sub">Fun for all levels · Stay Active · Great Community</p>
 </div>
 
 <div class="hours-strip">
-  <div class="hours-item">
-    <span class="icon">📅</span>
-    <span>WEEKDAY &nbsp;17:00 – 21:00</span>
+  <div class="hours-item">📅 WEEKDAY &nbsp;17:00 – 21:00</div>
+  <div class="hours-item">🗓️ WEEKEND &nbsp;07:00 – 21:00</div>
+</div>
+
+<div class="main">
+  <div class="steps" id="stepsBar">
+    <div class="step-dot active" id="s1">1</div>
+    <div class="step-line" id="l1"></div>
+    <div class="step-dot" id="s2">2</div>
+    <div class="step-line" id="l2"></div>
+    <div class="step-dot" id="s3">3</div>
   </div>
-  <div class="hours-item">
-    <span class="icon">🗓️</span>
-    <span>WEEKEND &nbsp;07:00 – 21:00</span>
+
+  <div class="card" id="mainCard">
+    <!-- Step content injected here -->
   </div>
 </div>
 
-<div class="container">
-  <div class="card">
-    <div class="card-title">Book Your Court</div>
-    <div class="card-sub">Fill in your details — we'll confirm via WhatsApp</div>
-
-    <div class="form-group">
-      <label>Full Name <span class="required">*</span></label>
-      <input type="text" id="name" placeholder="e.g. Ahmad Razif" />
-    </div>
-
-    <div class="row-2">
-      <div class="form-group">
-        <label>Phone Number <span class="required">*</span></label>
-        <input type="tel" id="phone" placeholder="e.g. 0123456789" />
-      </div>
-      <div class="form-group">
-        <label>No. of Players <span class="required">*</span></label>
-        <select id="players">
-          <option value="">Select</option>
-          <option value="2">2 Players</option>
-          <option value="3">3 Players</option>
-          <option value="4">4 Players</option>
-          <option value="5+">5+ Players</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row-2">
-      <div class="form-group">
-        <label>Date <span class="required">*</span></label>
-        <input type="date" id="date" />
-      </div>
-      <div class="form-group">
-        <label>Day Type <span class="required">*</span></label>
-        <select id="daytype">
-          <option value="">Select</option>
-          <option value="Weekday">Weekday</option>
-          <option value="Weekend">Weekend / Public Holiday</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Preferred Time Slot <span class="required">*</span></label>
-      <select id="timeslot">
-        <option value="">Select a time</option>
-        <option value="07:00 - 09:00">07:00 – 09:00 (Weekend only)</option>
-        <option value="09:00 - 11:00">09:00 – 11:00 (Weekend only)</option>
-        <option value="11:00 - 13:00">11:00 – 13:00 (Weekend only)</option>
-        <option value="13:00 - 15:00">13:00 – 15:00 (Weekend only)</option>
-        <option value="15:00 - 17:00">15:00 – 17:00 (Weekend only)</option>
-        <option value="17:00 - 19:00">17:00 – 19:00</option>
-        <option value="19:00 - 21:00">19:00 – 21:00</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Notes (Optional)</label>
-      <textarea id="notes" placeholder="e.g. First time playing, need equipment, etc."></textarea>
-    </div>
-
-    <div class="divider"></div>
-
-    <button class="submit-btn" onclick="bookNow()">🏓 SEND BOOKING VIA WHATSAPP</button>
-
-    <div class="whatsapp-note">
-      <span class="wa-icon">💬</span>
-      <span>Your details will open in WhatsApp — just tap Send to complete your booking!</span>
-    </div>
-  </div>
-</div>
-
-<div class="location-bar">
+<div class="footer">
   📍 Find us at
-  <strong>Texhouse, Lorong 14, Jalan Rubber</strong>
-  Fun for all levels · Stay active & healthy · Great community
+  <strong>Texhouse · Lorong 14, Jalan Rubber</strong>
 </div>
 
 <script>
-  const waNumber = "60178587259";
+const WA = "60178587259";
 
-  const dateInput = document.getElementById('date');
+const state = {
+  step: 1,
+  name: '', phone: '', players: '',
+  date: '', daytype: '', timeslot: '', notes: ''
+};
+
+const weekdaySlots = ['17:00 – 19:00','19:00 – 21:00'];
+const weekendSlots = [
+  '07:00 – 09:00','09:00 – 11:00',
+  '11:00 – 13:00','13:00 – 15:00',
+  '15:00 – 17:00','17:00 – 19:00','19:00 – 21:00'
+];
+
+function updateSteps(step){
+  for(let i=1;i<=3;i++){
+    const d = document.getElementById('s'+i);
+    if(i < step){ d.className='step-dot done'; d.innerHTML='✓'; }
+    else if(i === step){ d.className='step-dot active'; d.innerHTML=i; }
+    else{ d.className='step-dot'; d.innerHTML=i; }
+  }
+  for(let i=1;i<=2;i++){
+    const l = document.getElementById('l'+i);
+    l.className = i < step ? 'step-line done' : 'step-line';
+  }
+}
+
+function renderStep(){
+  updateSteps(state.step);
+  const card = document.getElementById('mainCard');
+  card.style.animation='none';
+  card.offsetHeight;
+  card.style.animation='slideUp 0.4s ease both';
+
+  if(state.step === 1) renderStep1(card);
+  else if(state.step === 2) renderStep2(card);
+  else if(state.step === 3) renderStep3(card);
+}
+
+function renderStep1(card){
   const today = new Date().toISOString().split('T')[0];
-  dateInput.setAttribute('min', today);
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-step-label">Step 1 of 3</div>
+      <div class="card-title">Your Details</div>
+      <div class="card-sub">Tell us who you are 👋</div>
+    </div>
+    <div class="form-group">
+      <label>Full Name <span class="req">*</span></label>
+      <input type="text" id="f-name" placeholder="e.g. Ahmad Razif" value="${state.name}" />
+    </div>
+    <div class="form-group">
+      <label>WhatsApp Number <span class="req">*</span></label>
+      <input type="tel" id="f-phone" placeholder="e.g. 0123456789" value="${state.phone}" />
+    </div>
+    <div class="form-group">
+      <label>Number of Players <span class="req">*</span></label>
+      <div class="player-grid" id="playerGrid">
+        ${['2','3','4','5+'].map(p=>`
+          <div class="player-btn${state.players===p?' selected':''}" onclick="selectPlayer('${p}')">
+            ${p==='5+'?'5+ 🎉':`${p} 🏓`}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes (Optional)</label>
+      <textarea id="f-notes" placeholder="First time? Need equipment? Special requests...">${state.notes}</textarea>
+    </div>
+    <button class="btn-next" onclick="goStep2()">Continue →</button>
+  `;
+}
 
-  dateInput.addEventListener('change', function() {
-    const d = new Date(this.value + 'T00:00:00');
-    const day = d.getDay();
-    const dayTypeEl = document.getElementById('daytype');
-    if (day === 0 || day === 6) {
-      dayTypeEl.value = 'Weekend';
+function selectPlayer(p){
+  state.players = p;
+  document.querySelectorAll('.player-btn').forEach(b=>{
+    b.className = 'player-btn'+(b.textContent.trim().startsWith(p.replace('+',''))&&p==='5+'||b.textContent.trim().includes(p+' ')?' selected':'');
+  });
+  document.querySelectorAll('.player-btn').forEach(b=>{
+    const txt = b.textContent.trim();
+    if((p==='5+' && txt.includes('5+')) || txt.startsWith(p+' ')||txt===p){
+      b.className='player-btn selected';
     } else {
-      dayTypeEl.value = 'Weekday';
+      b.className='player-btn';
     }
   });
+}
 
-  function bookNow() {
-    const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const players = document.getElementById('players').value;
-    const date = document.getElementById('date').value;
-    const daytype = document.getElementById('daytype').value;
-    const timeslot = document.getElementById('timeslot').value;
-    const notes = document.getElementById('notes').value.trim();
+function goStep2(){
+  state.name = document.getElementById('f-name').value.trim();
+  state.phone = document.getElementById('f-phone').value.trim();
+  state.notes = document.getElementById('f-notes').value.trim();
+  if(!state.name){alert('Please enter your name.');document.getElementById('f-name').focus();return;}
+  if(!state.phone){alert('Please enter your phone number.');document.getElementById('f-phone').focus();return;}
+  if(!state.players){alert('Please select number of players.');return;}
+  state.step=2; renderStep();
+}
 
-    if (!name || !phone || !players || !date || !daytype || !timeslot) {
-      alert('Please fill in all required fields before submitting.');
-      return;
-    }
+function renderStep2(card){
+  const today = new Date().toISOString().split('T')[0];
+  const isWeekend = state.daytype==='Weekend';
+  const slots = isWeekend ? weekendSlots : weekdaySlots;
 
-    const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-MY', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-step-label">Step 2 of 3</div>
+      <div class="card-title">Pick Your Slot</div>
+      <div class="card-sub">Choose your date & time 📅</div>
+    </div>
+    <div class="row2">
+      <div class="form-group">
+        <label>Date <span class="req">*</span></label>
+        <input type="date" id="f-date" min="${today}" value="${state.date}" onchange="onDateChange()" />
+      </div>
+      <div class="form-group">
+        <label>Day Type <span class="req">*</span></label>
+        <select id="f-daytype" onchange="onDayTypeChange()">
+          <option value="">Select</option>
+          <option value="Weekday"${state.daytype==='Weekday'?' selected':''}>Weekday</option>
+          <option value="Weekend"${state.daytype==='Weekend'?' selected':''}>Weekend / Holiday</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Time Slot <span class="req">*</span></label>
+      <div class="slot-grid" id="slotGrid">${renderSlots(slots)}</div>
+    </div>
+    <button class="btn-next" onclick="goStep3()">Review Booking →</button>
+    <button class="btn-back" onclick="goBack()">← Back</button>
+  `;
+}
 
-    let message = `Hello! I'd like to book a Pickleball court at Texhouse. 🏓\n\n`;
-    message += `📋 *BOOKING DETAILS*\n`;
-    message += `👤 Name: ${name}\n`;
-    message += `📱 Phone: ${phone}\n`;
-    message += `📅 Date: ${formattedDate}\n`;
-    message += `🗓️ Day: ${daytype}\n`;
-    message += `🕐 Time Slot: ${timeslot}\n`;
-    message += `👥 Players: ${players}\n`;
-    if (notes) message += `📝 Notes: ${notes}\n`;
-    message += `\nPlease confirm my booking. Thank you! 🙏`;
+function renderSlots(slots){
+  const isWeekend = state.daytype==='Weekend';
+  return slots.map(s=>{
+    const weekendOnly = !isWeekend && weekendSlots.includes(s) && !weekdaySlots.includes(s);
+    const sel = state.timeslot===s;
+    return `<div class="slot-btn${sel?' selected':''}${weekendOnly?' disabled':''}" onclick="${weekendOnly?'':'selectSlot(\''+s+'\')'}">
+      ${s}
+      ${weekendOnly?'<br><span class="slot-tag">Weekend only</span>':''}
+    </div>`;
+  }).join('');
+}
 
-    const encoded = encodeURIComponent(message);
-    const url = `https://wa.me/${waNumber}?text=${encoded}`;
-    window.open(url, '_blank');
+function onDateChange(){
+  const d = document.getElementById('f-date').value;
+  state.date = d;
+  if(d){
+    const day = new Date(d+'T00:00:00').getDay();
+    const dt = (day===0||day===6)?'Weekend':'Weekday';
+    state.daytype = dt;
+    document.getElementById('f-daytype').value = dt;
+    state.timeslot = '';
+    refreshSlots();
   }
-</script>
+}
 
+function onDayTypeChange(){
+  state.daytype = document.getElementById('f-daytype').value;
+  state.timeslot = '';
+  refreshSlots();
+}
+
+function refreshSlots(){
+  const isWeekend = state.daytype==='Weekend';
+  const slots = isWeekend ? weekendSlots : weekdaySlots;
+  document.getElementById('slotGrid').innerHTML = renderSlots(slots);
+}
+
+function selectSlot(s){
+  state.timeslot = s;
+  document.querySelectorAll('.slot-btn').forEach(b=>{
+    b.className = b.textContent.trim().startsWith(s.substring(0,5)) ? 'slot-btn selected' : 'slot-btn';
+  });
+}
+
+function goStep3(){
+  state.date = document.getElementById('f-date').value;
+  state.daytype = document.getElementById('f-daytype').value;
+  if(!state.date){alert('Please select a date.');return;}
+  if(!state.daytype){alert('Please select weekday or weekend.');return;}
+  if(!state.timeslot){alert('Please select a time slot.');return;}
+  state.step=3; renderStep();
+}
+
+function renderStep3(card){
+  const dateStr = new Date(state.date+'T00:00:00').toLocaleDateString('en-MY',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-step-label">Step 3 of 3</div>
+      <div class="card-title">Confirm Booking</div>
+      <div class="card-sub">Review your details below 🏓</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-icon">👤</div>
+      <div><div class="summary-label">Name</div><div class="summary-val">${state.name}</div></div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-icon">📱</div>
+      <div><div class="summary-label">Phone</div><div class="summary-val">${state.phone}</div></div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-icon">👥</div>
+      <div><div class="summary-label">Players</div><div class="summary-val">${state.players} player${state.players==='1'?'':'s'}</div></div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-icon">📅</div>
+      <div><div class="summary-label">Date</div><div class="summary-val">${dateStr}</div></div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-icon">🕐</div>
+      <div><div class="summary-label">Time Slot</div><div class="summary-val">${state.timeslot}</div></div>
+    </div>
+    ${state.notes?`<div class="summary-item">
+      <div class="summary-icon">📝</div>
+      <div><div class="summary-label">Notes</div><div class="summary-val">${state.notes}</div></div>
+    </div>`:''}
+    <button class="btn-submit" onclick="sendBooking()">💬 SEND VIA WHATSAPP</button>
+    <button class="btn-back" onclick="goBack()">← Edit Details</button>
+  `;
+}
+
+function goBack(){
+  if(state.step > 1){ state.step--; renderStep(); }
+}
+
+function sendBooking(){
+  const dateStr = new Date(state.date+'T00:00:00').toLocaleDateString('en-MY',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  let msg = `Hello! I'd like to book a Pickleball court at Texhouse. 🏓\n\n`;
+  msg += `📋 *BOOKING DETAILS*\n`;
+  msg += `👤 Name: ${state.name}\n`;
+  msg += `📱 Phone: ${state.phone}\n`;
+  msg += `📅 Date: ${dateStr}\n`;
+  msg += `🗓️ Day: ${state.daytype}\n`;
+  msg += `🕐 Time: ${state.timeslot}\n`;
+  msg += `👥 Players: ${state.players}\n`;
+  if(state.notes) msg += `📝 Notes: ${state.notes}\n`;
+  msg += `\nPlease confirm my booking. Thank you! 🙏`;
+
+  const url = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+
+  showSuccess();
+}
+
+function showSuccess(){
+  const card = document.getElementById('mainCard');
+  card.style.animation='none';card.offsetHeight;card.style.animation='slideUp 0.5s ease both';
+  card.innerHTML = `
+    <div class="success-state">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Booking Sent!</div>
+      <div class="success-sub">WhatsApp has opened with your booking details.<br>Just tap <strong>Send</strong> to complete your reservation.<br><br>We'll confirm your slot shortly! 🏓</div>
+      <button class="btn-next" style="margin-top:24px" onclick="resetForm()">Make Another Booking</button>
+    </div>
+  `;
+  document.getElementById('stepsBar').style.display='none';
+}
+
+function resetForm(){
+  Object.assign(state,{step:1,name:'',phone:'',players:'',date:'',daytype:'',timeslot:'',notes:''});
+  document.getElementById('stepsBar').style.display='flex';
+  renderStep();
+}
+
+renderStep();
+
+/* === ANIMATED CANVAS BG === */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles=[];
+
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function mkParticle(){
+  return {
+    x: Math.random()*W,
+    y: Math.random()*H,
+    r: Math.random()*3+1,
+    vx: (Math.random()-0.5)*0.4,
+    vy: (Math.random()-0.5)*0.4,
+    alpha: Math.random()*0.5+0.1,
+    hue: Math.random()>0.5?210:50
+  };
+}
+
+for(let i=0;i<80;i++) particles.push(mkParticle());
+
+let mouseX=W/2, mouseY=H/2;
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;});
+
+function drawLoop(){
+  ctx.clearRect(0,0,W,H);
+
+  // Deep blue gradient bg
+  const bg = ctx.createRadialGradient(W/2,H*0.3,0,W/2,H*0.3,Math.max(W,H)*0.8);
+  bg.addColorStop(0,'#0d2a5e');
+  bg.addColorStop(0.5,'#071830');
+  bg.addColorStop(1,'#030d1a');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Mouse glow
+  const mg = ctx.createRadialGradient(mouseX,mouseY,0,mouseX,mouseY,200);
+  mg.addColorStop(0,'rgba(255,214,0,0.04)');
+  mg.addColorStop(1,'rgba(255,214,0,0)');
+  ctx.fillStyle=mg;
+  ctx.fillRect(0,0,W,H);
+
+  // Connect nearby particles
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){
+        ctx.beginPath();
+        ctx.strokeStyle=`rgba(100,160,255,${0.15*(1-dist/120)})`;
+        ctx.lineWidth=0.5;
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Draw particles
+  for(const p of particles){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.hue===50
+      ? `rgba(255,214,0,${p.alpha})`
+      : `rgba(100,160,255,${p.alpha})`;
+    ctx.fill();
+
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>W) p.vx*=-1;
+    if(p.y<0||p.y>H) p.vy*=-1;
+  }
+
+  requestAnimationFrame(drawLoop);
+}
+drawLoop();
+
+/* === FLOATING PICKLEBALL BALLS === */
+const fb = document.getElementById('floatingBalls');
+const emojis = ['🏓','🎾','🏓','⚡','🏓'];
+for(let i=0;i<8;i++){
+  const el = document.createElement('div');
+  el.className='fball';
+  const size = Math.random()*60+30;
+  el.style.cssText=`
+    width:${size}px;height:${size}px;
+    left:${Math.random()*100}%;
+    font-size:${size*0.7}px;
+    background:transparent;
+    animation-duration:${Math.random()*12+8}s;
+    animation-delay:${Math.random()*10}s;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:0;opacity:0.12;
+  `;
+  el.textContent = emojis[i%emojis.length];
+  fb.appendChild(el);
+}
+</script>
 </body>
 </html>
